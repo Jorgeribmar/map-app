@@ -1,3 +1,10 @@
+# 1.0.0 (2025-03-21)
+
+
+### Bug Fixes
+
+* **geolocation:** add utility functions for better error handling ([e39c6fe](https://github.com/Jorgeribmar/map-app/commit/e39c6fe6112c283fd60265ebf66e20d59a02649d))
+
 # Changelog
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
@@ -14,4 +21,4 @@ All notable changes to this project will be documented in this file. See [standa
 - Multiple map styles (standard, satellite, terrain, dark)
 - Current location detection
 - Colored markers for search results
-- Responsive design with Material-UI components 
+- Responsive design with Material-UI components
