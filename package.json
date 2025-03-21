@@ -79,6 +79,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Jorgeribmar/map-app.git"
+    "url": "git+https://github.com/Jorgeribmar/map-app.git"
+  },
+  "publishConfig": {
+    "access": "restricted"
   }
 }
