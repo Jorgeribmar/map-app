@@ -15,6 +15,7 @@ import { Search, Place, Restaurant, Park, Business, School, Hotel } from '@mui/i
 import { useMap } from 'react-leaflet';
 import { SearchResult } from '../types';
 import ErrorBoundary from './ErrorBoundary';
+import { performanceMonitor } from '../utils/performance';
 
 interface SearchBarProps {
     onSelect: (result: SearchResult | null) => void;
@@ -121,9 +122,11 @@ const SearchBar = ({ onSelect }: SearchBarProps) => {
             }
 
             setLoading(true);
+            performanceMonitor.startMark('searchOperation');
             try {
                 const searchQuery = prepareSearchQuery(input);
 
+                performanceMonitor.startMark('apiRequest');
                 const searchParams: Record<string, string> = {
                     q: searchQuery,
                     format: 'json',
@@ -145,7 +148,12 @@ const SearchBar = ({ onSelect }: SearchBarProps) => {
                     `https://nominatim.openstreetmap.org/search?${params}`
                 );
                 const data = await response.json();
+                performanceMonitor.endMark('apiRequest', {
+                    query: searchQuery,
+                    resultCount: data.length
+                });
 
+                performanceMonitor.startMark('resultProcessing');
                 // Score results based on relevance
                 const scoredResults = data.map((item: any) => {
                     const result: SearchResult = {
@@ -217,12 +225,22 @@ const SearchBar = ({ onSelect }: SearchBarProps) => {
                     return (b.importance || 0) - (a.importance || 0);
                 });
 
+                performanceMonitor.endMark('resultProcessing', {
+                    processedResults: scoredResults.length,
+                    finalResults: sortedResults.slice(0, 10).length
+                });
+
                 setResults(sortedResults.slice(0, 10));
             } catch (error) {
                 console.error('Error fetching search results:', error);
                 setResults([]);
             } finally {
                 setLoading(false);
+                performanceMonitor.endMark('searchOperation', {
+                    query: input,
+                    success: results.length > 0
+                });
+                performanceMonitor.logMetrics();
             }
         };
 

@@ -10,6 +10,7 @@ import { Box, IconButton, Alert, Snackbar } from '@mui/material';
 import { History } from '@mui/icons-material';
 import WeatherControl from './WeatherControl';
 import ErrorBoundary from './ErrorBoundary';
+import { performanceMonitor } from '../utils/performance';
 
 // Fix for default marker icons in React-Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -56,19 +57,28 @@ const LocationMarker = () => {
     const map = useMap();
 
     useEffect(() => {
+        performanceMonitor.startMark('locationDetection');
         if ('geolocation' in navigator) {
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const pos: [number, number] = [position.coords.latitude, position.coords.longitude];
                     setPosition(pos);
                     map.setView(pos, 13);
+                    performanceMonitor.endMark('locationDetection', {
+                        success: true,
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    });
                 },
                 (error) => {
                     console.error('Error getting location:', error);
-                    // Fallback to London if geolocation fails
                     const defaultPos: [number, number] = [51.505, -0.09];
                     setPosition(defaultPos);
                     map.setView(defaultPos, 13);
+                    performanceMonitor.endMark('locationDetection', {
+                        success: false,
+                        error: error.message
+                    });
                 }
             );
         }
@@ -89,9 +99,15 @@ const MapController = ({ selectedLocation }: { selectedLocation: SearchResult | 
 
     useEffect(() => {
         if (selectedLocation) {
+            performanceMonitor.startMark('mapCentering');
             const lat = parseFloat(selectedLocation.lat);
             const lon = parseFloat(selectedLocation.lon);
             map.setView([lat, lon], 15);
+            performanceMonitor.endMark('mapCentering', {
+                latitude: lat,
+                longitude: lon,
+                locationName: selectedLocation.display_name
+            });
         }
     }, [map, selectedLocation]);
 
@@ -106,18 +122,36 @@ const Map = () => {
     const [isHistoryOpen, setIsHistoryOpen] = useState(false);
 
     const handleSearchSelect = (result: SearchResult | null) => {
+        performanceMonitor.startMark('searchSelection');
         if (result) {
             setSelectedLocation(result);
             setRecentSearches(prev => {
                 const newResult = { ...result, timestamp: Date.now() };
                 const filtered = prev.filter(item => item.place_id !== result.place_id);
-                return [newResult, ...filtered].slice(0, 10);
+                const newSearches = [newResult, ...filtered].slice(0, 10);
+                performanceMonitor.endMark('searchSelection', {
+                    locationName: result.display_name,
+                    historySize: newSearches.length
+                });
+                return newSearches;
+            });
+        } else {
+            performanceMonitor.endMark('searchSelection', {
+                success: false
             });
         }
     };
 
     const handleSearchClear = (result: SearchResult) => {
-        setRecentSearches(prev => prev.filter(item => item.place_id !== result.place_id));
+        performanceMonitor.startMark('historyClear');
+        setRecentSearches(prev => {
+            const newSearches = prev.filter(item => item.place_id !== result.place_id);
+            performanceMonitor.endMark('historyClear', {
+                removedLocation: result.display_name,
+                remainingHistory: newSearches.length
+            });
+            return newSearches;
+        });
         if (selectedLocation?.place_id === result.place_id) {
             setSelectedLocation(null);
         }
