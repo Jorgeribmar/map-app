@@ -1,21 +1,16 @@
-import { CssBaseline, AppBar, Toolbar, Typography, Box } from '@mui/material';
+import { ThemeProvider, CssBaseline } from '@mui/material';
 import Map from './components/Map';
+import ErrorBoundary from './components/ErrorBoundary';
+import theme from './theme';
 
 function App() {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-      <CssBaseline />
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div">
-            Interactive Map App
-          </Typography>
-        </Toolbar>
-      </AppBar>
-      <Box sx={{ flexGrow: 1 }}>
+    <ErrorBoundary>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
         <Map />
-      </Box>
-    </Box>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

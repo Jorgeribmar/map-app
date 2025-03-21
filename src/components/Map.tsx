@@ -9,6 +9,7 @@ import { SearchResult } from '../types';
 import { Box, IconButton, Alert, Snackbar } from '@mui/material';
 import { History } from '@mui/icons-material';
 import WeatherControl from './WeatherControl';
+import ErrorBoundary from './ErrorBoundary';
 
 // Fix for default marker icons in React-Leaflet
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -133,48 +134,62 @@ const Map = () => {
     return (
         <Box sx={{ display: 'flex', height: '100vh', width: '100%' }}>
             <Box sx={{ flexGrow: 1, position: 'relative' }}>
-                <MapContainer
-                    center={defaultPosition}
-                    zoom={13}
-                    style={{ height: '100%', width: '100%' }}
-                >
-                    <TileLayer
-                        attribution={mapStyles[mapStyle].attribution}
-                        url={mapStyles[mapStyle].url}
-                    />
-                    <LocationMarker />
-                    <SearchBar onSelect={handleSearchSelect} />
-                    <MapStyleControl style={mapStyle} onStyleChange={setMapStyle} />
-                    <WeatherControl />
-                    <MapController selectedLocation={selectedLocation} />
-                    {recentSearches.map((search, index) => (
-                        <Marker
-                            key={`${search.place_id}-${search.timestamp}`}
-                            position={[parseFloat(search.lat), parseFloat(search.lon)]}
-                            icon={coloredIcons[index % coloredIcons.length]}
-                        >
-                            <Popup>
-                                <div>
-                                    <strong>{search.display_name}</strong>
-                                    {search.type && (
-                                        <>
+                <ErrorBoundary>
+                    <MapContainer
+                        center={defaultPosition}
+                        zoom={13}
+                        style={{ height: '100%', width: '100%' }}
+                    >
+                        <TileLayer
+                            attribution={mapStyles[mapStyle].attribution}
+                            url={mapStyles[mapStyle].url}
+                        />
+                        <ErrorBoundary>
+                            <LocationMarker />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                            <SearchBar onSelect={handleSearchSelect} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                            <MapStyleControl style={mapStyle} onStyleChange={setMapStyle} />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                            <WeatherControl />
+                        </ErrorBoundary>
+                        <ErrorBoundary>
+                            <MapController selectedLocation={selectedLocation} />
+                        </ErrorBoundary>
+                        {recentSearches.map((search, index) => (
+                            <ErrorBoundary key={`error-boundary-${search.place_id}-${search.timestamp}`}>
+                                <Marker
+                                    key={`${search.place_id}-${search.timestamp}`}
+                                    position={[parseFloat(search.lat), parseFloat(search.lon)]}
+                                    icon={coloredIcons[index % coloredIcons.length]}
+                                >
+                                    <Popup>
+                                        <div>
+                                            <strong>{search.display_name}</strong>
+                                            {search.type && (
+                                                <>
+                                                    <br />
+                                                    <small>Type: {search.type}</small>
+                                                </>
+                                            )}
+                                            {search.address?.city && (
+                                                <>
+                                                    <br />
+                                                    <small>City: {search.address.city}</small>
+                                                </>
+                                            )}
                                             <br />
-                                            <small>Type: {search.type}</small>
-                                        </>
-                                    )}
-                                    {search.address?.city && (
-                                        <>
-                                            <br />
-                                            <small>City: {search.address.city}</small>
-                                        </>
-                                    )}
-                                    <br />
-                                    <small>Searched {search.timestamp ? new Date(search.timestamp).toLocaleString() : ''}</small>
-                                </div>
-                            </Popup>
-                        </Marker>
-                    ))}
-                </MapContainer>
+                                            <small>Searched {search.timestamp ? new Date(search.timestamp).toLocaleString() : ''}</small>
+                                        </div>
+                                    </Popup>
+                                </Marker>
+                            </ErrorBoundary>
+                        ))}
+                    </MapContainer>
+                </ErrorBoundary>
                 <IconButton
                     onClick={toggleHistory}
                     sx={{
@@ -191,13 +206,15 @@ const Map = () => {
                     <History />
                 </IconButton>
             </Box>
-            <SearchHistory
-                searches={recentSearches}
-                onSelect={handleHistorySelect}
-                onClear={handleSearchClear}
-                isOpen={isHistoryOpen}
-                onClose={() => setIsHistoryOpen(false)}
-            />
+            <ErrorBoundary>
+                <SearchHistory
+                    searches={recentSearches}
+                    onSelect={handleHistorySelect}
+                    onClear={handleSearchClear}
+                    isOpen={isHistoryOpen}
+                    onClose={() => setIsHistoryOpen(false)}
+                />
+            </ErrorBoundary>
         </Box>
     );
 };
