@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/Jorgeribmar/map-app/compare/v1.3.0...v1.4.0) (2025-03-21)
+
+
+### Features
+
+* implement performance monitoring in Map and SearchBar components ([e4c8640](https://github.com/Jorgeribmar/map-app/commit/e4c86407200c1d1727f76b1afa2ef1bdfbd59c79))
+
 # [1.3.0](https://github.com/Jorgeribmar/map-app/compare/v1.2.0...v1.3.0) (2025-03-21)
 
 
