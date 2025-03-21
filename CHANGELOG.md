@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/Jorgeribmar/map-app/compare/v1.2.0...v1.3.0) (2025-03-21)
+
+
+### Features
+
+* enhance application with error handling and theming ([d70bdd2](https://github.com/Jorgeribmar/map-app/commit/d70bdd298572fc119e770f0c6b200e4fd944e949))
+
 # [1.2.0](https://github.com/Jorgeribmar/map-app/compare/v1.1.0...v1.2.0) (2025-03-21)
 
 
