@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/Jorgeribmar/map-app/compare/v1.1.0...v1.2.0) (2025-03-21)
+
+
+### Features
+
+* add Docker support with Dockerfile and docker-compose.yml ([d8cadd4](https://github.com/Jorgeribmar/map-app/commit/d8cadd41cd583f0f918a210567375f32e8034277))
+
 # [1.1.0](https://github.com/Jorgeribmar/map-app/compare/v1.0.0...v1.1.0) (2025-03-21)
 
 
