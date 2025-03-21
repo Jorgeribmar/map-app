@@ -7,7 +7,9 @@ import {
     Typography,
     Paper,
     InputAdornment,
-    CircularProgress
+    CircularProgress,
+    Snackbar,
+    Alert
 } from '@mui/material';
 import { Search, Place, Restaurant, Park, Business, School, Hotel } from '@mui/icons-material';
 import { useMap } from 'react-leaflet';
@@ -74,6 +76,7 @@ const SearchBar = ({ onSelect }: SearchBarProps) => {
     const [loading, setLoading] = useState(false);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
     const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+    const [locationError, setLocationError] = useState<string>('');
     const map = useMap();
 
     // Get user's location
@@ -85,11 +88,27 @@ const SearchBar = ({ onSelect }: SearchBarProps) => {
                         lat: position.coords.latitude,
                         lon: position.coords.longitude
                     });
+                    setLocationError('');
                 },
                 (error) => {
                     console.error('Error getting location:', error);
+                    let errorMessage = 'Unable to get your location';
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            errorMessage = 'Location access was denied. Some features may be limited.';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            errorMessage = 'Location information is unavailable. Please try again.';
+                            break;
+                        case error.TIMEOUT:
+                            errorMessage = 'Location request timed out. Please try again.';
+                            break;
+                    }
+                    setLocationError(errorMessage);
                 }
             );
+        } else {
+            setLocationError('Geolocation is not supported by your browser. Some features may be limited.');
         }
     }, []);
 
@@ -242,78 +261,90 @@ const SearchBar = ({ onSelect }: SearchBarProps) => {
     };
 
     return (
-        <Box
-            sx={{
-                position: 'absolute',
-                top: 10,
-                left: 50,
-                zIndex: 1000,
-                width: '400px',
-                backgroundColor: 'white',
-                borderRadius: 1,
-                boxShadow: 3
-            }}
-        >
-            <Autocomplete
-                freeSolo
-                options={results}
-                getOptionLabel={(option) =>
-                    typeof option === 'string' ? option : option.display_name
-                }
-                filterOptions={(x) => x}
-                onChange={(_, value) => handleSelect(value as SearchResult | null)}
-                onInputChange={(_, value) => setInput(value)}
-                renderInput={(params) => (
-                    <TextField
-                        {...params}
-                        placeholder="Search locations..."
-                        variant="outlined"
-                        InputProps={{
-                            ...params.InputProps,
-                            startAdornment: (
-                                <InputAdornment position="start">
-                                    <Search />
-                                </InputAdornment>
-                            ),
-                            endAdornment: (
-                                <>
-                                    {loading && <CircularProgress size={20} />}
-                                    {params.InputProps.endAdornment}
-                                </>
-                            )
-                        }}
-                    />
-                )}
-                renderOption={(props, option) => (
-                    <Box component="li" {...props}>
-                        <Place sx={{ mr: 1 }} />
-                        <Box>
-                            <Typography variant="body1">
-                                {option.display_name}
-                            </Typography>
-                            <Typography variant="caption" color="text.secondary">
-                                {option.type}
-                                {option.address?.city && ` · ${option.address.city}`}
-                                {option.address?.country && ` · ${option.address.country}`}
-                                {userLocation && ` · ${formatDistance(option.lat, option.lon)}`}
-                            </Typography>
+        <>
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: 10,
+                    left: 50,
+                    zIndex: 1000,
+                    width: '400px',
+                    backgroundColor: 'white',
+                    borderRadius: 1,
+                    boxShadow: 3
+                }}
+            >
+                <Autocomplete
+                    freeSolo
+                    options={results}
+                    getOptionLabel={(option) =>
+                        typeof option === 'string' ? option : option.display_name
+                    }
+                    filterOptions={(x) => x}
+                    onChange={(_, value) => handleSelect(value as SearchResult | null)}
+                    onInputChange={(_, value) => setInput(value)}
+                    renderInput={(params) => (
+                        <TextField
+                            {...params}
+                            placeholder="Search locations..."
+                            variant="outlined"
+                            InputProps={{
+                                ...params.InputProps,
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Search />
+                                    </InputAdornment>
+                                ),
+                                endAdornment: (
+                                    <>
+                                        {loading && <CircularProgress size={20} />}
+                                        {params.InputProps.endAdornment}
+                                    </>
+                                )
+                            }}
+                        />
+                    )}
+                    renderOption={(props, option) => (
+                        <Box component="li" {...props}>
+                            <Place sx={{ mr: 1 }} />
+                            <Box>
+                                <Typography variant="body1">
+                                    {option.display_name}
+                                </Typography>
+                                <Typography variant="caption" color="text.secondary">
+                                    {option.type}
+                                    {option.address?.city && ` · ${option.address.city}`}
+                                    {option.address?.country && ` · ${option.address.country}`}
+                                    {userLocation && ` · ${formatDistance(option.lat, option.lon)}`}
+                                </Typography>
+                            </Box>
                         </Box>
-                    </Box>
-                )}
-            />
-            <Paper sx={{ mt: 1, p: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-                {categories.map(category => (
-                    <Chip
-                        key={category.value}
-                        icon={category.icon}
-                        label={category.label}
-                        onClick={() => handleCategoryToggle(category.value)}
-                        color={selectedCategories.includes(category.value) ? 'primary' : 'default'}
-                        variant={selectedCategories.includes(category.value) ? 'filled' : 'outlined'}
-                    />
-                ))}
-            </Paper>
-        </Box>
+                    )}
+                />
+                <Paper sx={{ mt: 1, p: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                    {categories.map(category => (
+                        <Chip
+                            key={category.value}
+                            icon={category.icon}
+                            label={category.label}
+                            onClick={() => handleCategoryToggle(category.value)}
+                            color={selectedCategories.includes(category.value) ? 'primary' : 'default'}
+                            variant={selectedCategories.includes(category.value) ? 'filled' : 'outlined'}
+                        />
+                    ))}
+                </Paper>
+            </Box>
+            <Snackbar
+                open={!!locationError}
+                autoHideDuration={6000}
+                onClose={() => setLocationError('')}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            >
+                <Alert onClose={() => setLocationError('')} severity="warning">
+                    {locationError}
+                </Alert>
+            </Snackbar>
+        </>
     );
 };
 
