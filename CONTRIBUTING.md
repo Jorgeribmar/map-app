@@ -1,66 +1,99 @@
 # Contributing to Map App
 
-## Commit Message Convention
+## How to Contribute
 
-This project follows [Conventional Commits](https://www.conventionalcommits.org/). Each commit message should be structured as follows:
+1. **Fork the Repository**
+   - Click the "Fork" button on GitHub
+   - Clone your fork locally:
+     ```bash
+     git clone https://github.com/YOUR_USERNAME/map-app.git
+     cd map-app
+     ```
 
-```
-<type>(<scope>): <description>
+2. **Create a Branch**
+   ```bash
+   git checkout -b feature/your-feature-name
+   # or
+   git checkout -b fix/your-fix-name
+   ```
 
-[optional body]
+3. **Make Your Changes**
+   - Write your code
+   - Add tests if applicable
+   - Ensure all tests pass: `npm test`
+   - Build the project: `npm run build`
 
-[optional footer(s)]
-```
+4. **Commit Your Changes**
+   We use [Conventional Commits](https://www.conventionalcommits.org/). Your commit messages should follow this format:
+   ```
+   type(scope): description
 
-### Types
+   [optional body]
 
-- `feat`: A new feature
-- `fix`: A bug fix
-- `docs`: Documentation only changes
-- `style`: Changes that do not affect the meaning of the code (white-space, formatting, etc)
-- `refactor`: A code change that neither fixes a bug nor adds a feature
-- `perf`: A code change that improves performance
-- `test`: Adding missing tests or correcting existing tests
-- `chore`: Changes to the build process or auxiliary tools and libraries
-- `ci`: Changes to CI configuration files and scripts
-- `revert`: Reverts a previous commit
+   [optional footer]
+   ```
+   Types:
+   - `feat`: New feature
+   - `fix`: Bug fix
+   - `docs`: Documentation changes
+   - `style`: Code style changes (formatting, etc)
+   - `refactor`: Code changes that neither fix bugs nor add features
+   - `test`: Adding or modifying tests
+   - `chore`: Changes to build process or auxiliary tools
 
-### Scope
+   Examples:
+   ```bash
+   git commit -m "feat(search): add autocomplete to location search"
+   git commit -m "fix(map): correct marker position calculation"
+   git commit -m "docs: update installation instructions"
+   ```
 
-The scope should be the name of the component or module affected (e.g., search, weather, map).
+5. **Push to Your Fork**
+   ```bash
+   git push origin feature/your-feature-name
+   ```
 
-### Examples
-
-```
-feat(search): add autocomplete to location search
-fix(weather): correct radar layer opacity
-docs(readme): update installation instructions
-test(map): add unit tests for map controls
-```
-
-### Breaking Changes
-
-Breaking changes should be indicated by adding `BREAKING CHANGE:` in the commit message body or footer:
-
-```
-feat(api): change weather API endpoint
-
-BREAKING CHANGE: The weather API endpoint has changed from /weather to /v2/weather
-```
+6. **Create a Pull Request**
+   - Go to your fork on GitHub
+   - Click "New Pull Request"
+   - Select your branch and submit the PR
+   - Fill in the PR template
+   - Wait for the checks to pass
 
 ## Pull Request Process
 
-1. Update the README.md with details of changes if needed
-2. Update the CHANGELOG.md with details of changes
-3. Follow the commit message convention
-4. The PR will be merged once you have the sign-off from a maintainer
+1. Ensure your PR includes:
+   - Clear description of changes
+   - Any updates to documentation
+   - Test coverage for new features
+   - No unnecessary changes or commits
+
+2. The PR will be reviewed by maintainers who may:
+   - Request changes
+   - Approve the PR
+   - Provide feedback
+
+3. Once approved:
+   - Your PR will be merged
+   - The changes will be included in the next release
+   - A new version will be automatically published
 
 ## Development Setup
 
-1. Fork and clone the repository
-2. Install dependencies: `npm install`
-3. Start development server: `npm run dev`
-4. Run tests: `npm test`
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Start development server:
+   ```bash
+   npm run dev
+   ```
+
+3. Run tests:
+   ```bash
+   npm test
+   ```
 
 ## Release Process
 
@@ -68,4 +101,6 @@ Releases are handled automatically by semantic-release based on conventional com
 
 - Patch Release (1.0.1): `fix` commits
 - Minor Release (1.1.0): `feat` commits
-- Major Release (2.0.0): commits with `BREAKING CHANGE` in body or footer 
+- Major Release (2.0.0): commits with `BREAKING CHANGE` in body or footer
+
+Contributors don't need to worry about releases - they are handled automatically when changes are merged to main. 
