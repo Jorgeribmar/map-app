@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/main.tsx","./src/types.ts","./src/vite-env.d.ts","./src/components/map.tsx","./src/components/mapstylecontrol.tsx","./src/components/searchbar.tsx","./src/components/searchhistory.tsx","./src/components/weathercontrol.tsx"],"version":"5.7.3"}
